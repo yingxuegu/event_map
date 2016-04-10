@@ -2,6 +2,7 @@
       return {
         // Feature Service 
         citizenRequestLayerUrl: 'https://services5.arcgis.com/qcRPZLCjjoC6rxgQ/arcgis/rest/services/event6/FeatureServer/0',
+        //citizenRequestLayerUrl: 'http://sampleserver5.arcgisonline.com/ArcGIS/rest/services/LocalGovernment/CitizenRequests/FeatureServer/0',
         // infoTemplate for reporting.
         infoTemplate: {
                   title: '<b>${objectid}</b>',

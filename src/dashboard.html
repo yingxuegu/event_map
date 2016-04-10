@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"  <title>Citizen Request Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"  <title>Event Dashboard</title>
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="app/css/keen-dashboards.css" />
   <link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.11/esri/css/esri.css">
@@ -23,7 +24,7 @@
 <!--         <a class="navbar-brand hidden-xs" href="#">
           <span class="glyphicon glyphicon-chevron-left"></span>
         </a> -->
-        <a class="navbar-brand" href="#">Citizen Request Dashboard</a>
+        <a class="navbar-brand" href="#">Event Dashboard</a>
       </div>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
@@ -47,7 +48,7 @@
           <div class="col-sm-12">
             <div class="chart-wrapper">
               <div class="chart-title">
-                Request Severity
+                Event Type
               </div>
               <div class="chart-stage">
                 <div class="chart left">
@@ -58,14 +59,14 @@
                 </div>
               </div>
               <div class="chart-notes">
-                Number of requests by Severity.
+                Number of events by Type.
               </div>
             </div>
           </div>
           <div class="col-sm-12">
             <div class="chart-wrapper">
               <div class="chart-title">
-                Request Type
+                Event Type
               </div>
               <div class="chart-stage">
                 <div class="chart">
@@ -73,7 +74,7 @@
                 </div>
               </div>
               <div class="chart-notes">
-                Number of requests by type.
+                Number of events by type.
               </div>
             </div>
           </div>
@@ -111,13 +112,13 @@
       <div class="col-sm-6">
         <div class="chart-wrapper">
           <div class="chart-title">
-            Request Map
+            Event Map
           </div>
           <div class="map-stage">
             <div id="map"></div>
           </div>
           <div class="chart-notes">
-            Map of citzen request locations.
+            Map of Event locations.
           </div>
         </div>
       </div>
@@ -154,28 +155,20 @@
   <script>
     require([
       'chartjs/Chart',
-
       'app/map',
       'app/config',
-      'app/cedar',
-
       'dojo/domReady!'
-    ], function(Chart, mapUtils, config, Cedar) {
-
+    ], function(Chart, mapUtils, config) {
       var severityChart, // pie chart
         requestTypeChart; // bar chart
-
       // TODO: get these from the feature layer on load
       var severityFieldDomainCodedValuesDict = config.severityFieldDomainCodedValuesDict;
       var requestTypeFieldDomainCodedValuesDict = config.requestTypeFieldDomainCodedValuesDict;
-
       // override chart defaults
       Chart.defaults.global.responsive = true;
       Chart.defaults.global.maintainAspectRatio = false;
-
       // kick off the application
       initMap();
-
       // initialize map and wire it up to the charts
       function initMap() {
         // create responsive map
@@ -189,7 +182,6 @@
         });
         map.addLayer(citizenRequestLayer);
       }
-
       window.severityDomainLookup = function (value, key, data){
           return severityFieldDomainCodedValuesDict[value];
         };
@@ -199,19 +191,15 @@
       window.formatPhoneNumber = function (value, key, data){
           return value ? '<a href=\'tel:' + value + '\'>' + value + '</a>' : '';
         };
-
       // refresh chart based on feature layer stats
       function updateCharts(featureLayer, extent) {
         // get stats for feature layer
         var stats = getGraphicsStats(featureLayer.graphics, ['severity', 'requesttype'], extent);
-
         // create or update severity chart
         updateSeverityChart(stats.severity.counts);
-
         // create or update request type chart
-        updateRequestTypeChart(stats.requesttype.counts);
+        updateRequestTypeChart(stats.severity.counts);
       }
-
       // get stats for each group by field
       // TODO: currently only gets counts
       // could aslo be configured to get the sum, etc
@@ -225,7 +213,6 @@
         });
         return stats;
       }
-
       // get stats for a group by field
       // TODO: currently only gets counts
       // could aslo be configured to get the sum, etc
@@ -251,25 +238,36 @@
           counts: fieldCounts
         };
       }
-
       function updateSeverityChart(counts) {
         // create severity chart data;
         var segments = {
           '0': {
             color: '#46BFBD',
             highlight: '#5AD3D1',
-            label: 'General Nuisance'
+            label: 'Education'
           },
           '1': {
             color: '#FDB45C',
             highlight: '#FFC870',
-            label: 'Important To Resolve Soon'
+            label: 'Entainment'
           },
           '2': {
             color:'#F7464A',
             highlight: '#FF5A5E',
-            label: 'Critical Issue'
+            label: 'Food and Drinks'
+          },
+          '3': {
+            color:'#0066ff',
+            highlight: '#66a3ff',
+            label: 'Outdoor'
+          },
+          '4': {
+            color:'#00ff99',
+            highlight: '#33ffad',
+            label: 'Special Event'
           }
+
+
         };
         var data = [];
         for (var key in segments) {
@@ -279,7 +277,6 @@
             data.push(segment);
           }
         }
-
         // create or update chart
         if (severityChart) {
           severityChart.destroy();
@@ -288,16 +285,14 @@
         severityChart = new Chart(ctx).Pie(data, {
           legendTemplate : '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<segments.length; i++){%><li><span style="background-color:<%=segments[i].fillColor%>"></span><%if(segments[i].label){%><%=segments[i].label%><%}%>: <%=segments[i].value%></li><%}%></ul>'
         });
-
         // update legend
         var legend = severityChart.generateLegend();
         document.getElementById('severity-legend').innerHTML = legend;
       }
-
       function updateRequestTypeChart(counts) {
         // create reuest type chart data;
         var data = {
-          labels: ['Abandoned Vehicle','Animal Services','Driveway Infraction','Flooding','Graffiti Removal','Homeless Nuisance','Illegal Dumping','Parking Violation','Plant/Tree Complaint','Pothole Obstruction','Roadway Danger','Sidewalk Danger','Streetlight Broken','Street Sign Missing/Damaged','Trash Removal','Water Leak','Yard Waste Removal'],
+          labels: ['Education','Entainment','Food and Drinks','Outdoor','Special Event'],
           datasets: [
             {
               label: 'Request Types',
@@ -325,3 +320,5 @@
   </script>
 </body>
 </html>
+Status API Training Shop Blog About
+© 2016 GitHub, Inc. Terms Privacy Security Contact Help
