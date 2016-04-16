@@ -147,7 +147,7 @@
                 <li role="presentation"><a  role="menuitem" tabindex="-1" data-name="osm" href="#">Open Street Map</a></li>
               </ul>
             </div>
-            <p>
+          
             	<br>
             	<br>
             	<br>
@@ -162,16 +162,6 @@
              <div class="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="true" 
                   data-auto-logout-link="true">
              </div>
-				<div id='status'>
-				</div>
-				<div id="UserImg">	
-				</div>
-				<button id="fbLogout" onclick="fbLogout()">
-					<a class="fb_button fb_button_medium">
-						<span class="fb_button_text">Logout</span>
-					</a>
-				</button>
-			</p>
           </div>
         </div>
       </div>
@@ -310,13 +300,7 @@
     </script>
 
 
-    <script>
-      function fbLogout() {
-        FB.logout(function(response) {
-    // user is now logged out
-        });
-      }
-    </script>
+    
 
     <!-- build:remove -->
     <!-- configure Dojo, load Esri JS, and kick off app -->
