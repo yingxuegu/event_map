@@ -116,6 +116,7 @@ define([
 
     attributes.start_time = event_start;
     attributes.end_time = event_end;
+    //attributes.commennt = description;
 
     console.log(event_start);
 
