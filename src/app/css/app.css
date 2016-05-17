@@ -8,6 +8,10 @@ a.sidebar-toggle-button {
   margin-left: 10px;
 }
 
+.calender {
+  widh: 100%;
+}
+
 /*may need to override styles of logo image to fit in navbar*/
 /*
 .navbar-brand>img {
